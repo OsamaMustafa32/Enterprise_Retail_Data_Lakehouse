@@ -1,0 +1,6 @@
+# DLT and Spark are provided by Databricks runtime; list for local dev / reference
+# pyspark>=3.4.0
+# dlt (Databricks Delta Live Tables - use repo-installed or cluster libs)
+
+# Synthetic data generator
+faker>=20.0.0
