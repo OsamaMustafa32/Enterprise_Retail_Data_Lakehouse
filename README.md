@@ -1,6 +1,8 @@
 # Enterprise Retail Data Lakehouse
 
-A batch data pipeline and analytics setup for retail (apparel) data. The pipeline runs on a schedule (e.g. hourly); sales, customers, products, and stores land as Delta tables in the landing zone, are cleaned and modeled with SCD2 dimensions in silver, then aggregated in gold. The **Retail Analytics Executive Dashboard** reads from the gold layer and refreshes on the same schedule (e.g. hourly) for KPIs, trends, and store/product performance.
+A batch data pipeline and analytics setup for retail (apparel) data. The pipeline runs on a schedule (e.g. hourly). Sales, customers, products, and stores land as Delta tables in the landing zone, are cleaned and modeled with SCD2 dimensions in silver, then aggregated in gold. The **Retail Analytics Executive Dashboard** reads from the gold layer and refreshes on the same schedule (e.g. hourly) for KPIs, trends, and store/product performance.
+![Pipeline graph](Images/Pipeline_graph.png)
+![Data model](Images/data_model.png)
 
 ## What’s in here
 
@@ -24,7 +26,7 @@ A batch data pipeline and analytics setup for retail (apparel) data. The pipelin
 
 - Synthetic data generator appends new batches to Delta tables under Unity Catalog volumes (sales, customers, items, stores).
 - On disk: Parquet data files plus the Delta transaction log (`_delta_log`). No raw JSON or standalone Parquet files — everything is Delta.
-- **Purpose:** Single place for incoming data that the pipeline reads from; Delta gives append semantics and schema evolution.
+- **Purpose:** Single place for incoming data that the pipeline reads from. Delta offers append semantics and schema evolution.
 
 <!-- Screenshot: [Add screenshot of landing zone / volume structure here] -->
 
@@ -32,15 +34,15 @@ A batch data pipeline and analytics setup for retail (apparel) data. The pipelin
 
 - DLT streaming tables read from the landing Delta paths (`spark.readStream.format("delta").load(RAW_*_PATH)`).
 - Type casting and basic constraints (e.g. non-null transaction_id, customer_id, product_id, store_id).
-- **Purpose:** Raw-but-typed copy of what landed; foundation for silver transformations.
+- **Purpose:** Source layer for silver. Silver reads from bronze for cleansing and dimension/fact modeling.
 
 <!-- Screenshot: [Add screenshot of bronze tables / pipeline graph here] -->
 
 ### Silver layer
 
-- Cleansing views with DLT expectations (valid email, price ranges, category not null, etc.); invalid rows dropped or flagged.
+- Cleansing views with DLT expectations (valid email, price ranges, category not null, etc.). Invalid rows dropped or flagged.
 - SCD2 dimension tables for customers, products, and stores (history tracked by `last_update_time`).
-- Current-dimension views for join to facts; sales and returns fact tables with referential integrity to dimensions.
+- Current-dimension views for join to facts. Sales and returns fact tables with referential integrity to dimensions.
 - **Purpose:** Clean, historically accurate dimensions and fact tables for analytics.
 
 <!-- Screenshot: [Add screenshot of silver layer / SCD2 or cleansing here] -->
@@ -87,10 +89,14 @@ The DLT pipeline is configured to use the folder that contains these Python file
 
 ## Analytics capabilities
 
-- **Executive summary:** Total revenue, transaction count, unique customers, average order value; revenue trend over time; top stores and top products by revenue; revenue by category and by payment method.
-- **Product analytics:** Category performance (revenue, quantity, avg price); top products by revenue and quantity; product mix and price vs quantity.
-- **Store performance:** Revenue and transaction counts per store; average transaction value and items per transaction; active vs inactive stores; bottom-performing stores for attention.
-- **Customer analytics:** Customer segments (e.g. by spend or behavior); contribution to revenue; support for lifetime value and retention views from gold tables.
+The gold layer supports:
+
+- Order and sales trends
+- Customer behavior and segment analysis
+- Product and category performance metrics
+- Store performance and comparison
+- Data quality validation (via silver expectations, gold is consumption-ready)
+- Date-range–optimized dashboard queries
 
 ---
 
@@ -101,15 +107,9 @@ The DLT pipeline is configured to use the folder that contains these Python file
 ### Key data engineering skills demonstrated
 
 - **Medallion architecture:** Landing (Delta) → bronze → silver (SCD2 + cleansing) → gold (aggregations).
-- **Delta Lake:** Landing and all layers as Delta; append-only landing with streaming read into bronze.
+- **Delta Lake:** Landing and all layers as Delta. Append-only landing with streaming read into bronze.
 - **Delta Live Tables (DLT):** Declarative pipeline with expectations, SCD2 via `create_auto_cdc_flow`, and automatic lineage/graph.
 - **Unity Catalog:** Catalog, schemas, and volumes for access control and organization.
 - **Data quality:** DLT expectations (expect vs expect_or_drop) and referential integrity in silver/gold.
-- **Batch orchestration:** Pipeline scheduled (e.g. hourly); dashboard aligned to the same schedule.
+- **Batch orchestration:** Pipeline scheduled (e.g. hourly). Dashboard aligned to the same schedule.
 - **Synthetic data:** Python + Faker + Spark generating realistic retail data and writing Delta to landing for end-to-end testing.
-
----
-
-## License
-
-MIT. See [LICENSE](LICENSE) in the repo.
