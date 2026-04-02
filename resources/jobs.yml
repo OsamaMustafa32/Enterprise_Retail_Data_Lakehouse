@@ -1,0 +1,18 @@
+resources:
+  jobs:
+    enterprise_retail_data_lakehouse_hourly:
+      name: ${bundle.name}-${bundle.target}-hourly
+      max_concurrent_runs: 1
+      email_notifications:
+        on_failure:
+          - your-email@example.com
+        no_alert_for_skipped_runs: true
+      schedule:
+        quartz_cron_expression: ${var.hourly_quartz_cron}
+        timezone_id: ${var.timezone_id}
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: update_dlt_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.enterprise_retail_data_lakehouse.id}
+      performance_target: PERFORMANCE_OPTIMIZED

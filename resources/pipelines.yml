@@ -1,0 +1,23 @@
+resources:
+  pipelines:
+    enterprise_retail_data_lakehouse:
+      name: ${bundle.name}-${bundle.target}
+      channel: CURRENT
+      continuous: false
+      photon: true
+      serverless: true
+      catalog: ${var.catalog_name}
+      schema: ${var.default_schema}
+      libraries:
+        - file:
+            path: ${workspace.file_path}/retail_data_lakehouse/dlt/bronze_raw_ingestion.py
+        - file:
+            path: ${workspace.file_path}/retail_data_lakehouse/dlt/silver_data_cleansing.py
+        - file:
+            path: ${workspace.file_path}/retail_data_lakehouse/dlt/silver_scd2_dimensions.py
+        - file:
+            path: ${workspace.file_path}/retail_data_lakehouse/dlt/silver_current_dimensions.py
+        - file:
+            path: ${workspace.file_path}/retail_data_lakehouse/dlt/silver_fact_segmentation.py
+        - file:
+            path: ${workspace.file_path}/retail_data_lakehouse/dlt/gold_analytics_aggregations.py

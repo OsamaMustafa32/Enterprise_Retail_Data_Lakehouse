@@ -1,0 +1,27 @@
+bundle:
+  name: enterprise_retail_data_lakehouse
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog_name:
+    description: Unity Catalog catalog used by the DLT pipeline
+    default: apparel_store
+  default_schema:
+    description: Default schema for the DLT pipeline (tables are schema-qualified in code)
+    default: 01_bronze
+  hourly_quartz_cron:
+    description: Hourly schedule for the job (Quartz cron)
+    default: "0 0 * * * ?"
+  timezone_id:
+    description: Timezone for the job schedule
+    default: Asia/Calcutta
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      # Uses your current Databricks CLI auth/profile for the workspace host.
+      root_path: /Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
