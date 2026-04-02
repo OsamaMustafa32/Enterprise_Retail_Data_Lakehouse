@@ -92,6 +92,9 @@ Volumes below are for the demo environment. The pipeline is built to scale with 
 | `setup_unity_catalog.ipynb` | Creates the catalog, schemas, and volumes and sets permissions. |
 | `pipeline_maintenance.ipynb` | Utility to drop pipeline tables and checkpoints for a full reset. |
 | `Dashboard/dashboard_queries.sql` | SQL used by the Retail Analytics Executive Dashboard (parameterized by date range). |
+| `databricks.yml` | Databricks Asset Bundle config: bundle name, parametrized variables (catalog, schema, schedule), and deployment target. |
+| `resources/pipelines.yml` | DLT pipeline definition: source files, catalog, schema, Photon and Serverless enabled. |
+| `resources/jobs.yml` | Hourly scheduled job that triggers the DLT pipeline, with email alerts on failure. |
 
 ### 💡 Why all files are in the same directory
 
